@@ -10,15 +10,19 @@ const connection = mysql.createConnection({
 })
 
 let departments;
-let departmentNames = [];
 
 let roles;
-let roleNames = [];
 
-let managers;
-let mangagerNames = []
+let employees;
+
+let allNames = {
+    employee: [],
+    role: [],
+    department: []
+}
 
 const init = () => {
+
 
     connection.query(
         'SELECT * FROM department',
@@ -26,7 +30,7 @@ const init = () => {
             if(err) throw err;
             departments = res
             departments.forEach(i => {
-                departmentNames.push(i.name)
+                allNames.department.push(i.name)
             })
         }
     )
@@ -37,24 +41,22 @@ const init = () => {
             if(err) throw err;
             roles = res
             roles.forEach(i => {
-                roleNames.push(i.title)
+                allNames.role.push(i.title)
             })
         }
     )
 
-    // connection.query(
-    //     'SELECT * FROM employee WHERE ?',
-    //     {
-    //         title: 'Manager'
-    //     },
-    //     (err,res) => {
-    //         if(err) throw err;
-    //         managers = res
-    //         managers.forEach(i => {
-    //             managerNames.push(i.name)
-    //         })
-    //     }
-    // )
+    connection.query(
+        'SELECT * FROM employee',
+        (err,res) => {
+            if(err) throw err;
+            employees = res
+            employees.forEach(i => {
+                allNames.employee.push(i.title)
+            })
+        }
+    )
+
 
 
     inquirer
@@ -67,9 +69,9 @@ const init = () => {
                     'Add a department',
                     'Add a role',
                     'Add an employee',
-                    'View all departments',
-                    'View all roles',
-                    'View all employees',
+                    'View a department',
+                    'View a role',
+                    'View an employee',
                     'Update an employees role',
                     'Exit'
                 ]
@@ -82,12 +84,12 @@ const init = () => {
                 addRole()
             } else if (data.action == 'Add an employee'){
                 addEmployee()
-            } else if (data.action == 'View all departments'){
-                view('departments')
-            } else if (data.action == 'View all roles'){
-                view('roles')
-            } else if (data.action == 'View all employees'){
-                view('employees')
+            } else if (data.action == 'View a department'){
+                view('department')
+            } else if (data.action == 'View a role'){
+                view('role')
+            } else if (data.action == 'View an employee'){
+                view('employee')
             }  else if (data.action == 'Update an employees role'){
                 updateRole()
             } else if (data.action == 'Exit'){
@@ -138,7 +140,7 @@ const addRole = () => {
                 type: 'list',
                 name: 'department',
                 message: `Choose role's department`,
-                choices: departmentNames
+                choices: allNames.department
             }
         ])
         .then((data) => {
@@ -189,7 +191,7 @@ const addEmployee = () => {
                 type: 'list',
                 name: 'role',
                 message: `Select employees role`,
-                choices: roleNames
+                choices: allNames.role
             },
         ])
         .then((data) => {
@@ -217,6 +219,35 @@ const addEmployee = () => {
                 }
             )
         })
+        .then(() => askContinue())
+}
+
+const view = (target) => {
+
+    console.log(allNames[target])
+
+    inquirer
+        .prompt([
+            {
+                type: 'list',
+                name: 'selected',
+                message: `Please select which ${target} you would like to view`,
+                choices: allNames[target]
+            }
+        ])
+        .then((data) => {
+            console.log(selected)
+        })
+    // connection.query(
+    //     `SELECT * FROM ${target} WHERE ?`,
+    //     {
+    //         id: id
+    //     },
+    //     (err,res) => {
+    //         if(err) throw err;
+    //         console.log(res)
+    //     }
+    // )
 }
 
 
