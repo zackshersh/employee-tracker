@@ -192,6 +192,36 @@ const addEmployee = () => {
                 choices: departmentNames
             },
         ])
+        .then((data) => {
+            let roleId;
+            roles.forEach(role => {
+                if(data.role == role.name){
+                    roletId = role.id;
+                }
+            })
+
+            let departmentId;
+            departments.forEach(department => {
+                if(data.department == department.name){
+                    departmentId = department.id;
+                }
+            })
+
+            const query = connection.query(
+                'INSERT INTO employee SET ?',
+                {
+                    first_name: data.first_name,
+                    last_name: data.last_name,
+                    role_id: roleId,
+                    department_id: departmentId
+                },
+                (err,res) => {
+                    if (err) throw err;
+                    console.log('\x1b[32m%s\x1b[0m', 'Role successfully added.');
+
+                }
+            )
+        })
 }
 
 
