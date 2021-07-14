@@ -52,7 +52,7 @@ const init = () => {
             if(err) throw err;
             employees = res
             employees.forEach(i => {
-                allNames.employee.push(i.title)
+                allNames.employee.push(`${i.last_name}`)
             })
         }
     )
@@ -236,7 +236,29 @@ const view = (target) => {
             }
         ])
         .then((data) => {
-            console.log(selected)
+
+            let allInstances;
+            let nameOrTitle;
+            if(target == 'department'){
+                allInstances = departments
+                nameOrTitle = 'name'
+            } else if (target == 'role'){
+                allInstances = roles
+                nameOrTitle = 'title'
+            } else {
+                allInstances = employees
+                nameOrTitle = 'last_name'
+            }
+
+            let instanceData;
+
+            allInstances.forEach(i => {
+                if(i[nameOrTitle] == data.selected){
+                    instanceData = i
+                }
+            })
+
+            console.log(instanceData)
         })
     // connection.query(
     //     `SELECT * FROM ${target} WHERE ?`,
