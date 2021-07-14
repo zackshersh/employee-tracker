@@ -24,7 +24,6 @@ const init = () => {
         'SELECT * FROM department',
         (err,res) => {
             if(err) throw err;
-            console.log(res)
             departments = res
             departments.forEach(i => {
                 departmentNames.push(i.name)
@@ -40,7 +39,6 @@ const init = () => {
             roles.forEach(i => {
                 roleNames.push(i.title)
             })
-            console.log(roleNames)
         }
     )
 
@@ -187,29 +185,16 @@ const addEmployee = () => {
                 name: 'manager_id',
                 message: `Input this employee's manager's id`
             },
-            // {
-            //     type: 'input',
-            //     name: 'role_id',
-            //     message: `Input this employee's role id`
-            // },
             {
                 type: 'list',
                 name: 'role',
                 message: `Select employees role`,
                 choices: roleNames
             },
-            // {
-            //     type: 'list',
-            //     name: 'department',
-            //     message: `Select employees department`,
-            //     choices: departmentNames
-            // }
         ])
         .then((data) => {
-            console.log(data)
             let roleId;
             roles.forEach(role => {
-                console.log(role)
                 if(data.role == role.title){
                     roleId = role.id;
                 }
