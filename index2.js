@@ -24,6 +24,7 @@ const init = () => {
         'SELECT * FROM department',
         (err,res) => {
             if(err) throw err;
+            console.log(res)
             departments = res
             departments.forEach(i => {
                 departmentNames.push(i.name)
@@ -37,24 +38,25 @@ const init = () => {
             if(err) throw err;
             roles = res
             roles.forEach(i => {
-                roleNames.push(i.name)
+                roleNames.push(i.title)
             })
+            console.log(roleNames)
         }
     )
 
-    connection.query(
-        'SELECT * FROM employee WHERE ?',
-        {
-            title: 'Manager'
-        },
-        (err,res) => {
-            if(err) throw err;
-            managers = res
-            managers.forEach(i => {
-                managerNames.push(i.name)
-            })
-        }
-    )
+    // connection.query(
+    //     'SELECT * FROM employee WHERE ?',
+    //     {
+    //         title: 'Manager'
+    //     },
+    //     (err,res) => {
+    //         if(err) throw err;
+    //         managers = res
+    //         managers.forEach(i => {
+    //             managerNames.push(i.name)
+    //         })
+    //     }
+    // )
 
 
     inquirer
@@ -166,6 +168,7 @@ const addRole = () => {
         .then(() => askContinue());
 }
 
+
 const addEmployee = () => {
     inquirer
         .prompt([
@@ -180,32 +183,39 @@ const addEmployee = () => {
                 message: `Input employee's last name`
             },
             {
+                type: 'input',
+                name: 'manager_id',
+                message: `Input this employee's manager's id`
+            },
+            // {
+            //     type: 'input',
+            //     name: 'role_id',
+            //     message: `Input this employee's role id`
+            // },
+            {
                 type: 'list',
                 name: 'role',
                 message: `Select employees role`,
                 choices: roleNames
             },
-            {
-                type: 'list',
-                name: 'department',
-                message: `Select employees department`,
-                choices: departmentNames
-            },
+            // {
+            //     type: 'list',
+            //     name: 'department',
+            //     message: `Select employees department`,
+            //     choices: departmentNames
+            // }
         ])
         .then((data) => {
+            console.log(data)
             let roleId;
             roles.forEach(role => {
-                if(data.role == role.name){
-                    roletId = role.id;
+                console.log(role)
+                if(data.role == role.title){
+                    roleId = role.id;
                 }
             })
 
-            let departmentId;
-            departments.forEach(department => {
-                if(data.department == department.name){
-                    departmentId = department.id;
-                }
-            })
+            console.log(roleId);
 
             const query = connection.query(
                 'INSERT INTO employee SET ?',
@@ -213,11 +223,11 @@ const addEmployee = () => {
                     first_name: data.first_name,
                     last_name: data.last_name,
                     role_id: roleId,
-                    department_id: departmentId
+                    manager_id: data.manager_id
                 },
                 (err,res) => {
                     if (err) throw err;
-                    console.log('\x1b[32m%s\x1b[0m', 'Role successfully added.');
+                    console.log('\x1b[32m%s\x1b[0m', 'Employee successfully added.');
 
                 }
             )
@@ -243,6 +253,9 @@ const askContinue = () => {
             }
         })
 }
+
+
+
 
 
 connection.connect((err) => {
