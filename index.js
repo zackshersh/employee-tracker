@@ -1,6 +1,7 @@
 const mysql = require('mysql');
 const inquirer = require('inquirer');
 
+
 const utils = require('./utils')
 
 const connection = mysql.createConnection({
@@ -89,6 +90,7 @@ const init = () => {
             }
         ])
         .then((data)=> {
+
             if (data.action == 'Add a department') {
                 addDepartment()
             } else if (data.action == 'Add a role'){
@@ -106,6 +108,8 @@ const init = () => {
             } else if (data.action == 'Exit'){
                 return;
             }
+
+
         })
 }
 
@@ -286,7 +290,7 @@ const updateRole = () => {
         .then(() => askContinue());
 }
 
-const view = (target) => {
+const view = async (target) => {
 
     console.log('below')
     let searched = search(employees,'first_name','Dude')
@@ -323,6 +327,9 @@ const view = (target) => {
                     instanceData = i
                 }
             })
+
+
+            console.table(instanceData)
         })
     // connection.query(
     //     `SELECT * FROM ${target} WHERE ?`,
@@ -362,6 +369,26 @@ const askContinue = () => {
 
 
 
+async function getRoleById(id){
+
+    const role = await connection.query(
+        'SELECT * FROM role WHERE ?',
+        {
+            id: id
+        },
+        (err,res) => {
+            if(err) throw err;
+            return res[0].title
+        }
+    )
+
+    // roles.forEach(role => {
+    //     if(role.id == id){
+    //         return role.title;
+    //     }
+    // })
+}
+
 
 
 connection.connect((err) => {
@@ -369,6 +396,8 @@ connection.connect((err) => {
     console.log(`connected as id ${connection.threadId}`)
 
     init()
+
+
 })
 
 module.exports = { connection }
