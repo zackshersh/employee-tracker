@@ -1,6 +1,8 @@
 const mysql = require('mysql');
 const inquirer = require('inquirer');
 
+const utils = require('./utils')
+
 const connection = mysql.createConnection({
     host: 'localhost',
     port: 3306,
@@ -8,6 +10,7 @@ const connection = mysql.createConnection({
     password: 'tucker10',
     database: 'employeesDB'
 })
+
 
 let departments;
 
@@ -232,6 +235,57 @@ const addEmployee = () => {
         .then(() => askContinue())
 }
 
+
+const updateRole = () => {
+    inquirer   
+        .prompt([
+            {
+                type: 'list',
+                name: 'employee',
+                message: 'Which employee would you like to update?',
+                choices: allNames.employee
+            },
+            {
+                type: 'list',
+                name: 'role',
+                message: 'What would you like their role to be',
+                choices: allNames.role
+            }
+        ])
+        .then((data) => {
+            let employeeId;
+            employees.forEach(employee => {
+                if(data.employee == employee.last_name){
+                    employeeId = employee.id;
+                }
+            })
+
+            let roleId;
+            roles.forEach(role => {
+                if(data.role == role.title){
+                    roleId = role.id;
+                }
+            })
+
+            connection.query(
+                'UPDATE employee SET ? WHERE ?',
+                [
+                    {
+                        role_id: roleId
+                    },
+                    {
+                        id: employeeId
+                    }
+                ],
+                (err,res) => {
+                    if (err) throw err;
+                    console.log('\x1b[32m%s\x1b[0m', 'Employee role updated.')
+                }
+            )
+        })
+        .then(() => askContinue());
+}
+
 const view = (target) => {
 
     console.log('below')
@@ -285,6 +339,8 @@ const view = (target) => {
 
 
 
+
+
 const askContinue = () => {
     inquirer
         .prompt([
@@ -311,6 +367,7 @@ const askContinue = () => {
 connection.connect((err) => {
     if (err) throw err;
     console.log(`connected as id ${connection.threadId}`)
+
     init()
 })
 
